@@ -6,13 +6,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.midwestinstruments.watermeter.R;
 import com.midwestinstruments.watermeter.view.dummy.DummyContent.DummyItem;
 
 import java.util.List;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
- * specified {@link OnListFragmentInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
 public class MyConfigMeterRecyclerViewAdapter extends RecyclerView.Adapter<MyConfigMeterRecyclerViewAdapter.ViewHolder> {
@@ -27,7 +27,7 @@ public class MyConfigMeterRecyclerViewAdapter extends RecyclerView.Adapter<MyCon
 
 	@Override
 	public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-		View view = LayoutInflater.from(parent.getContext()).inflate(android.R.layout., parent, false);
+		View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_show_meter, parent, false);
 		return new ViewHolder(view);
 	}
 

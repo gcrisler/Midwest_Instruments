@@ -8,7 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.android.bluetoothlegatt.R;
+import com.midwestinstruments.watermeter.R;
+
 
 /**
  * A simple {@link Fragment} subclass.

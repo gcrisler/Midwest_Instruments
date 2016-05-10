@@ -10,11 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.android.bluetoothlegatt.R;
+import com.midwestinstruments.watermeter.R;
 import com.midwestinstruments.watermeter.view.dummy.DummyContent;
 import com.midwestinstruments.watermeter.view.dummy.DummyContent.DummyItem;
-
-import java.util.List;
 
 /**
  * A fragment representing a list of Items.

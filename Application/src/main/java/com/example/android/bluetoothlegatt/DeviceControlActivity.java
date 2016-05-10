@@ -35,6 +35,8 @@ import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 
+import com.midwestinstruments.watermeter.R;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,7 +59,8 @@ public class DeviceControlActivity extends Activity {
 	private String mDeviceAddress;
 	private ExpandableListView mGattServicesList;
 	private BluetoothLeService mBluetoothLeService;
-	private ArrayList<ArrayList<BluetoothGattCharacteristic>> mGattCharacteristics = new ArrayList<ArrayList<BluetoothGattCharacteristic>>();
+	private ArrayList<ArrayList<BluetoothGattCharacteristic>> mGattCharacteristics = new
+			ArrayList<ArrayList<BluetoothGattCharacteristic>>();
 	private boolean mConnected = false;
 	private BluetoothGattCharacteristic mNotifyCharacteristic;
 
@@ -273,8 +276,9 @@ public class DeviceControlActivity extends Activity {
 		}
 
 		SimpleExpandableListAdapter gattServiceAdapter = new SimpleExpandableListAdapter(this, gattServiceData, android.R.layout
-				.simple_expandable_list_item_2, new String[]{LIST_NAME, LIST_UUID}, new int[]{android.R.id.text1, android.R.id.text2}, gattCharacteristicData,
-				android.R.layout.simple_expandable_list_item_2, new String[]{LIST_NAME, LIST_UUID}, new int[]{android.R.id.text1, android.R.id.text2});
+				.simple_expandable_list_item_2, new String[]{LIST_NAME, LIST_UUID}, new int[]{android.R.id.text1, android.R.id
+				.text2}, gattCharacteristicData, android.R.layout.simple_expandable_list_item_2, new String[]{LIST_NAME, LIST_UUID},
+				new int[]{android.R.id.text1, android.R.id.text2});
 		mGattServicesList.setAdapter(gattServiceAdapter);
 	}
 
