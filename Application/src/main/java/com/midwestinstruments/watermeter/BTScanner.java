@@ -63,6 +63,11 @@ public class BTScanner {
 	private final Handler handler;
 
 	/**
+	 * Callback to run when a scan result is found
+	 */
+	private ScannerCallback callback;
+
+	/**
 	 * Create a new Scanner Object
 	 * @param parentActivity the parent activity
 	 */
@@ -75,6 +80,14 @@ public class BTScanner {
 		Error.check(btMan == null, parentActivity, "Could not get BT Manager", Error.BTLE_NOT_SUPPORTED);
 		bluetoothFacade = btMan.getAdapter();
 		Error.check(bluetoothFacade == null, parentActivity, "Could not get BT Adapter", Error.BTLE_NOT_SUPPORTED);
+	}
+
+	/**
+	 * Set the code to run when a scanresult is received from a BT device.
+	 * @param callback the code to run
+	 */
+	public void setCallback(ScannerCallback callback) {
+		this.callback = callback;
 	}
 
 	/**
@@ -123,6 +136,9 @@ public class BTScanner {
 		bluetoothFacade.getBluetoothLeScanner().stopScan(scanResult);
 	}
 
+	public interface ScannerCallback {
+		void onScan(ScanResult result);
+	}
 
 	/**
 	 * Scan callback. This is called when any result from a scan is found.
@@ -132,6 +148,9 @@ public class BTScanner {
 		public void onScanResult(int callbackType, ScanResult result) {
 			//called when each scan result comes through
 			Log.d(SCANNER, String.format("scan result %s rssi:%d", result.getDevice().getName(), result.getRssi()));
+			if(callback != null) {
+				callback.onScan(result);
+			}
 			super.onScanResult(callbackType, result);
 		}
 
@@ -160,6 +179,6 @@ public class BTScanner {
 				parentActivity.getApplicationContext(),
 				android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED,
 			parentActivity, "User did not accept permissions",
-				new Error("Course Location Permissions are required for Bluetooth Low Energy scans");
+				new Error("Coarse Location Permissions are required for Bluetooth Low Energy scans"));
 	}
 }

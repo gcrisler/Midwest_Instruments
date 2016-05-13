@@ -1,6 +1,7 @@
 package com.midwestinstruments.watermeter;
 
 import android.app.ListActivity;
+import android.bluetooth.le.ScanResult;
 import android.os.Bundle;
 
 /**
@@ -12,10 +13,21 @@ import android.os.Bundle;
 public class ScanActivity extends ListActivity {
 
 	private BTScanner scanner;
+	private ScanListAdapter activityData;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		activityData = new ScanListAdapter(this);
 		scanner = new BTScanner(this);
+		scanner.setCallback(new BTScanner.ScannerCallback() {
+			@Override
+			public void onScan(ScanResult result) {
+				ScanData data = new ScanData();
+				data.set(result);
+				activityData.add(data);
+			}
+		});
+		setListAdapter(activityData);
 
 		super.onCreate(savedInstanceState);
 	}
