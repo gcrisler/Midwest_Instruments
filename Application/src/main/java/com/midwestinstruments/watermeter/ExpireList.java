@@ -59,4 +59,8 @@ public class ExpireList<T extends Comparable> {
 		}
 		return result;
 	}
+
+	public ArrayList<Node> getNodes() {
+		return new ArrayList<>(nodes);
+	}
 }

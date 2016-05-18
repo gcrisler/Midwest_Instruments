@@ -2,6 +2,7 @@ package com.midwestinstruments.watermeter;
 
 import android.content.Context;
 import android.database.DataSetObserver;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,11 @@ public class ScanListAdapter implements ListAdapter {
 
 	public void add(ScanData item) {
 		list.add(item, System.currentTimeMillis());
+		notifyObservers();
+	}
+
+	public void update(long offset) {
+		list.update(System.currentTimeMillis() - offset);
 		notifyObservers();
 	}
 
@@ -85,7 +91,11 @@ public class ScanListAdapter implements ListAdapter {
 		}
 
 		((TextView)v.findViewById(R.id.textView3)).setText(list.getList().get(position).getName());
-		((TextView)v.findViewById(R.id.textView2)).setText(Integer.toString(list.getList().get(position).getRssi()));
+		((TextView)v.findViewById(R.id.textView2)).setText("db: "+Integer.toString(list.getList().get(position).getRssi()));
+		long time = System.currentTimeMillis() - list.getNodes().get(position).updateTime;
+		((TextView)v.findViewById(R.id.textView3)).setTextColor(Color.argb((int)(255*Math.exp(-time/10000.0)),0,0,0));
+		((TextView)v.findViewById(R.id.textView2)).setTextColor(Color.argb((int)(255*Math.exp(-time/10000.0)),0,0,0));
+
 		return v;
 	}
 

@@ -8,6 +8,7 @@ import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
@@ -79,7 +80,16 @@ public class BTScanner {
 		BluetoothManager btMan = (BluetoothManager)parentActivity.getSystemService(Context.BLUETOOTH_SERVICE);
 		Error.check(btMan == null, parentActivity, "Could not get BT Manager", Error.BTLE_NOT_SUPPORTED);
 		bluetoothFacade = btMan.getAdapter();
-		Error.check(bluetoothFacade == null, parentActivity, "Could not get BT Adapter", Error.BTLE_NOT_SUPPORTED);
+
+		checkEnableBT();
+	}
+
+	private void checkEnableBT() {
+		if (bluetoothFacade == null || !bluetoothFacade.isEnabled()) {
+			Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+			parentActivity.startActivityForResult(enableBtIntent, 1);
+		}
+		//Error.check(bluetoothFacade == null, parentActivity, "Could not get BT Adapter", Error.BTLE_NOT_SUPPORTED);
 	}
 
 	/**
@@ -104,6 +114,8 @@ public class BTScanner {
 	private void internalStart() {
 
 		checkPermissions();
+
+		bluetoothFacade.enable();
 
 		// when our activity comes to the front, start scanning
 		bluetoothFacade.getBluetoothLeScanner().startScan(Collections.singletonList(filter), scanSettings, scanResult);

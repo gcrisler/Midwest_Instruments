@@ -1,5 +1,6 @@
 package com.midwestinstruments.watermeter;
 
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.le.ScanResult;
 
 /**
@@ -10,9 +11,11 @@ public class ScanData implements Comparable<ScanData> {
 	private String name;
 	private int rssi;
 	private int flow;
+	private BluetoothDevice device;
 
 	public void set(ScanResult result) {
-		name = result.getDevice().getName();
+		device = result.getDevice();
+		name = device.getName();
 		rssi = result.getRssi();
 		flow = -1;
 	}
@@ -28,6 +31,8 @@ public class ScanData implements Comparable<ScanData> {
 	public String getName() {
 		return name;
 	}
+
+	public BluetoothDevice getDevice() { return device; }
 
 	@Override
 	public boolean equals(Object o) {
