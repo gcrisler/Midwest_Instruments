@@ -10,7 +10,8 @@ import android.widget.NumberPicker;
 public class LimitedNumberPicker extends NumberPicker {
 
 	/**
-	 * NumberPicker only supports positive numbers. We have negative numbers, so offset the values by this amount so the numbers positive under the covers
+	 * NumberPicker only supports positive numbers. We have negative numbers, so offset the values by this amount so the numbers
+	 * positive under the covers
 	 */
 	private int offset = 0;
 
@@ -30,6 +31,7 @@ public class LimitedNumberPicker extends NumberPicker {
 
 	/**
 	 * Read the min and max from the xml instead of hardcoding.
+	 *
 	 * @param attrs attributes from the xml
 	 */
 	private void setup(AttributeSet attrs) {
@@ -46,10 +48,5 @@ public class LimitedNumberPicker extends NumberPicker {
 				return String.format("%d%%", value + offset);
 			}
 		});
-	}
-
-	@Override
-	public int getValue() {
-		return super.getValue() + offset;
 	}
 }

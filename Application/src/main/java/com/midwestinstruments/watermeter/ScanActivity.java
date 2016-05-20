@@ -43,6 +43,7 @@ public class ScanActivity extends ListActivity {
 			}
 		});
 		setListAdapter(activityData);
+		setContentView(R.layout.activity_scan);
 
 		super.onCreate(savedInstanceState);
 	}

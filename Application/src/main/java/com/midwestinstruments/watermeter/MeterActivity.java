@@ -84,6 +84,8 @@ public class MeterActivity extends Activity {
 				startActivity(intent);
 				return true;
 			case R.id.menu_config_action:
+				startActivity(new Intent(this, MeterSettingsActivity.class));
+				return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}

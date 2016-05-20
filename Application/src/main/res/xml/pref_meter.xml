@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference
+        android:title="Meter Name"
+        android:maxLines="1"
+        android:key="meter_name_pref"
+        />
+
+    <ListPreference
+        android:title="Pipe Size"
+        android:entries="@array/pref_pipe_size_label"
+        android:entryValues="@array/pref_pipe_size"
+        android:key="pipe_size_pref"
+        />
+    <ListPreference
+        android:title="Flow Rate Units"
+        android:entries="@array/pref_flow_units_label"
+        android:entryValues="@array/pref_flow_units"
+        android:key="flow_rate_pref"
+        />
+    <com.midwestinstruments.watermeter.NumberPickerPreference
+        android:title="Adjustment Factor"
+        android:key="adjustment_factor_pref"
+        />
+</PreferenceScreen>
