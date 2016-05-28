@@ -28,13 +28,12 @@ public class MeterSettingsActivity extends PreferenceActivity {
 		int id = item.getItemId();
 		if (id == android.R.id.home) {
 			if (!super.onMenuItemSelected(featureId, item)) {
-				NavUtils.navigateUpFromSameTask(this);
+				finish();
 			}
 			return true;
 		}
 		return super.onMenuItemSelected(featureId, item);
 	}
-
 
 	private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
 		@Override
@@ -77,10 +76,10 @@ public class MeterSettingsActivity extends PreferenceActivity {
 			super.onCreate(savedInstanceState);
 
 			addPreferencesFromResource(R.xml.pref_meter);
-			bindPreferenceSummaryToValue(findPreference("meter_name_pref"));
+			//bindPreferenceSummaryToValue(findPreference("meter_name_pref"));
 			bindPreferenceSummaryToValue(findPreference("pipe_size_pref"));
 			bindPreferenceSummaryToValue(findPreference("flow_rate_pref"));
-			bindPreferenceSummaryToValue(findPreference("adjustment_factor_pref"));
+			//bindPreferenceSummaryToValue(findPreference("adjustment_factor_pref"));
 		}
 	}
 

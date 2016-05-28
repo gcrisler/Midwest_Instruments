@@ -8,41 +8,128 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="@color/backgroundColor"
     tools:context="com.midwestinstruments.watermeter.MeterActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="--"
-        android:id="@+id/floatRate"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"/>
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="--"
-        android:id="@+id/totalizerFlowRate"
-        android:layout_below="@+id/floatRate"
-        android:layout_alignParentStart="true"/>
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="20dp">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:id="@+id/resetFlowRate"
-        android:layout_below="@+id/totalizerFlowRate"
-        android:layout_alignParentStart="true"
-        android:text="--"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text=""
+                android:id="@+id/floatRate"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="false"
+                android:background="@drawable/lcd"
+                android:padding="@dimen/margin_lcd"
+                android:typeface="normal"
+                android:textSize="@dimen/lcd_big_font_size"
 
-    <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Reset Total"
-        android:id="@+id/resetButton"
-        android:layout_below="@+id/resetFlowRate"
-        android:layout_alignParentStart="true"/>
+                android:layout_alignParentEnd="false"
+                android:gravity="right"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="@string/label1"
+                android:id="@+id/textView"
+                android:layout_gravity="center_horizontal"
+                android:textColor="@color/labelTextColor"
+                android:background="@color/labelBackgroundColor"
+                android:paddingLeft="@dimen/margin_label_lr"
+                android:paddingRight="@dimen/margin_label_lr" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="20dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text=""
+                android:id="@+id/totalizerFlowRate"
+                android:layout_below="@+id/floatRate"
+                android:layout_alignParentStart="true"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/lcd"
+                android:padding="@dimen/margin_lcd"
+                android:width="300dp"
+                android:typeface="normal"
+                android:textSize="@dimen/lcd_small_font_size"
+                android:singleLine="true"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="@string/label3"
+                android:layout_gravity="center_horizontal"
+                android:textColor="@color/labelTextColor"
+                android:background="@color/labelBackgroundColor"
+                android:paddingLeft="@dimen/margin_label_lr"
+                android:paddingRight="@dimen/margin_label_lr"  />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:id="@+id/resetFlowRate"
+                android:layout_below="@+id/totalizerFlowRate"
+                android:layout_alignParentStart="true"
+                android:text=""
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/lcd"
+                android:padding="@dimen/margin_lcd"
+                android:width="300dp"
+                android:typeface="normal"
+                android:textSize="@dimen/lcd_small_font_size"
+                android:singleLine="true"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="@string/label2"
+                android:layout_gravity="center_horizontal"
+                android:textColor="@color/labelTextColor"
+                android:background="@color/labelBackgroundColor"
+                android:paddingLeft="@dimen/margin_label_lr"
+                android:paddingRight="@dimen/margin_label_lr"  />
+
+            <Button
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Reset Total"
+                android:id="@+id/resetButton"
+                android:layout_below="@+id/resetFlowRate"
+                android:layout_alignParentStart="true"
+                android:layout_gravity="right"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
 </RelativeLayout>

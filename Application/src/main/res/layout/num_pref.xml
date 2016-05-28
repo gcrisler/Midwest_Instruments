@@ -14,7 +14,7 @@
               android:layout_height='wrap_content'
               android:textAppearance='?android:attr/textAppearanceMedium'
               android:layout_marginBottom='10dp' />
-    <com.midwestinstruments.watermeter.widget.LimitedNumberPicker
+    <com.midwestinstruments.watermeter.preferences.LimitedNumberPicker
         android:id="@+id/pref_num_picker"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

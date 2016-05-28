@@ -14,7 +14,7 @@ public class MeterActivity extends Activity {
 
 	static BluetoothDevice device;
 
-	private BTDeviceConnection connection;
+	static BTDeviceConnection connection;
 
 	private BTDeviceConnection.BTDeviceCallback callback = new BTDeviceConnection.BTDeviceCallback() {
 		@Override
@@ -66,6 +66,7 @@ public class MeterActivity extends Activity {
 				connection.resetTotal();
 			}
 		});
+		connection.connect(device);
 	}
 
 	@Override
@@ -92,14 +93,9 @@ public class MeterActivity extends Activity {
 	}
 
 	@Override
-	protected void onResume() {
-		connection.connect(device);
-		super.onResume();
-	}
-
-	@Override
-	protected void onPause() {
+	protected void onDestroy() {
+		// This won't get run if we get killed, but if we do, the OS will recoup the resources anyway
 		connection.disconnect();
-		super.onPause();
+		super.onDestroy();
 	}
 }

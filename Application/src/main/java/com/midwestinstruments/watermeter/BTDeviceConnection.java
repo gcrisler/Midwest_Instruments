@@ -12,7 +12,6 @@ import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 
-import com.example.android.bluetoothlegatt.SampleGattAttributes;
 
 import java.util.UUID;
 
@@ -20,6 +19,8 @@ import java.util.UUID;
  * Created by byronh on 5/13/16.
  */
 public class BTDeviceConnection {
+
+	public static String CLIENT_CHARACTERISTIC_CONFIG = "00002902-0000-1000-8000-00805f9b34fb";
 
 	/**
 	 * The interface to all bluetooth operations
@@ -92,8 +93,7 @@ public class BTDeviceConnection {
 
 		private void setupCharacteristic(BluetoothGattCharacteristic characteristic) {
 			btGatt.setCharacteristicNotification(characteristic, true);
-			final BluetoothGattDescriptor descriptor = characteristic.getDescriptor(UUID.fromString(SampleGattAttributes
-					.CLIENT_CHARACTERISTIC_CONFIG));
+			final BluetoothGattDescriptor descriptor = characteristic.getDescriptor(UUID.fromString(CLIENT_CHARACTERISTIC_CONFIG));
 			descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
 			queue.scheduleOperation(new Runnable() {
 				@Override

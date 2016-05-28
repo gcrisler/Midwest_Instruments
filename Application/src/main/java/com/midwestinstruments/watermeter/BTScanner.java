@@ -15,6 +15,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.Collections;
 
 /**
@@ -118,7 +119,7 @@ public class BTScanner {
 		bluetoothFacade.enable();
 
 		// when our activity comes to the front, start scanning
-		bluetoothFacade.getBluetoothLeScanner().startScan(Collections.singletonList(filter), scanSettings, scanResult);
+		bluetoothFacade.getBluetoothLeScanner().startScan(new ArrayList<ScanFilter>(), scanSettings, scanResult);
 
 		// schedule the next iteration
 		handler.postDelayed(new Runnable() {

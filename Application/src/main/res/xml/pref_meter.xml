@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <EditTextPreference
+    <com.midwestinstruments.watermeter.preferences.MeterNamePreference
         android:title="Meter Name"
         android:maxLines="1"
         android:key="meter_name_pref"
+        android:selectAllOnFocus="true"
         />
 
     <ListPreference
@@ -18,7 +19,7 @@
         android:entryValues="@array/pref_flow_units"
         android:key="flow_rate_pref"
         />
-    <com.midwestinstruments.watermeter.NumberPickerPreference
+    <com.midwestinstruments.watermeter.preferences.NumberPickerPreference
         android:title="Adjustment Factor"
         android:key="adjustment_factor_pref"
         />
