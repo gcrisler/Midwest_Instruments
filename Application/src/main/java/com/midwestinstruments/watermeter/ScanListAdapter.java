@@ -10,6 +10,7 @@ import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -74,7 +75,7 @@ public class ScanListAdapter implements ListAdapter {
 
 	@Override
 	public long getItemId(int position) {
-		return list.getList().get(position).getName().hashCode();
+		return Objects.hash(list.getList().get(position).getName());
 	}
 
 	@Override

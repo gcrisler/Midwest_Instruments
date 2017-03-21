@@ -11,6 +11,7 @@ import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
+import android.util.Log;
 
 
 import java.util.UUID;
@@ -33,14 +34,22 @@ public class BTDeviceConnection {
 
 	private BluetoothGattService btGattService;
 
-	private BTDeviceCallback operationCallback;
+	private volatile BTFlowDeviceCallback flowCallback = new DefaultBTDeviceCallback();
+	private volatile BTSettingsDeviceCallback settingsCallback = new DefaultBTDeviceCallback();
 
 	private BTOperationQueue queue;
 
-	public interface BTDeviceCallback {
+	public interface BTFlowDeviceCallback {
 		void onFlowRateUpdate(int flowrate);
 		void onTotalUpdate(int floatRate);
 		void onResetTotalUpdate(int resetRate);
+	}
+
+	public interface  BTSettingsDeviceCallback {
+		void onPipeSizeUpdate(int pipeSize);
+		void onAdjustmentUpdate(int adjustment);
+		void onIdUpdate(String id);
+		void onSerialUpdate(int serial);
 	}
 
 	public BTDeviceConnection(Activity parent) {
@@ -51,12 +60,24 @@ public class BTDeviceConnection {
 		bluetoothFacade = btMan.getAdapter();
 	}
 
-	public void setCallback(BTDeviceCallback callback) {
-		this.operationCallback = callback;
+	public void setCallback(BTFlowDeviceCallback callback) {
+		if(callback == null) {
+			this.flowCallback = new DefaultBTDeviceCallback();
+		} else {
+			this.flowCallback = callback;
+		}
+	}
+
+	public void setSettingsCallback(BTSettingsDeviceCallback callback) {
+		if(callback == null) {
+			this.settingsCallback = new DefaultBTDeviceCallback();
+		} else {
+			this.settingsCallback = callback;
+		}
 	}
 
 	public void connect(BluetoothDevice device) {
-		btGatt = device.connectGatt(parentActivity.getApplicationContext(), false, callback);
+		btGatt = device.connectGatt(parentActivity.getApplicationContext(), false, gattCallback);
 		btGatt.connect();
 		queue = new BTOperationQueue();
 	}
@@ -66,52 +87,108 @@ public class BTDeviceConnection {
 		queue.stopQueue();
 	}
 
+
+
+	public interface BTCharacteristicOperation {
+		public void execute(BluetoothGattCharacteristic gattChar);
+	}
+
+	public void scheduleGattWrite(String gattUUID, BTCharacteristicOperation op) {
+		queue.scheduleOperation(()->{
+				BluetoothGattCharacteristic gattChar = btGattService.getCharacteristic(UUID.fromString(gattUUID));
+				op.execute(gattChar);
+				btGatt.writeCharacteristic(gattChar);
+			}
+		);
+	}
+
+
 	/**
 	 * Reset Total
 	 */
 	public void resetTotal() {
-		queue.scheduleOperation(new Runnable() {
-			@Override
-			public void run() {
-				BluetoothGattCharacteristic reset = btGattService.getCharacteristic(UUID.fromString(MWDevice
-						.RESET_FLOAT_RATE_UUID_CHAR));
-				reset.setValue(0, BluetoothGattCharacteristic.FORMAT_UINT8, 0);
-				btGatt.writeCharacteristic(reset);
-			}
+		scheduleGattWrite(MWDevice.RESET_FLOAT_RATE_UUID_CHAR, (BluetoothGattCharacteristic gattChar) -> {
+			gattChar.setValue(0, BluetoothGattCharacteristic.FORMAT_UINT8, 0);
 		});
 	}
 
-	BluetoothGattCallback callback = new BluetoothGattCallback() {
+	class Settings {
+		public void setMeterId(String id) {
+			if(id.length() <= 4) {
+				Log.w("TODO", "No device support yet");
+			}
+		}
+
+		public void setPipeSize(int index) {
+			if(index >= 0 && index < 16) {
+				scheduleGattWrite(MWDevice.PIPE_SIZE_INDEX_UUID_CHAR, (BluetoothGattCharacteristic gattChar) -> {
+					gattChar.setValue(index, BluetoothGattCharacteristic.FORMAT_UINT8, 0);
+				});
+			}
+		}
+
+		public void setAdjustmentFactor(int percentage) {
+			if(percentage >= 500 && percentage <= 1500) {
+				scheduleGattWrite(MWDevice.ADJUSTMENT_FACTOR_UUID_CHAR, (BluetoothGattCharacteristic gattChar) -> {
+					gattChar.setValue(percentage, BluetoothGattCharacteristic.FORMAT_UINT16, 0);
+				});
+			}
+		}
+	}
+
+	public final Settings SETTINGS = new Settings();
+
+	private void setupCharacteristic(BluetoothGattCharacteristic characteristic) {
+		btGatt.setCharacteristicNotification(characteristic, true);
+		final BluetoothGattDescriptor descriptor = characteristic.getDescriptor(UUID.fromString(CLIENT_CHARACTERISTIC_CONFIG));
+		descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+		queue.scheduleOperation(() -> {
+			btGatt.writeDescriptor(descriptor);
+		});
+
+	}
+//
+//	public void setupSettings() {
+//		btGattService = btGatt.getService(UUID.fromString(MWDevice.SERVICE_UUID));
+//
+//		setupCharacteristic(btGattService.getCharacteristic(UUID.fromString(MWDevice.ADJUSTMENT_FACTOR_UUID_CHAR)));
+//		setupCharacteristic(btGattService.getCharacteristic(UUID.fromString(MWDevice.PIPE_SIZE_INDEX_UUID_CHAR)));
+//		//setupCharacteristic(btGattService.getCharacteristic(UUID.fromString(MWDevice.ID_UUID_CHAR)));
+//	}
+
+	public void setupMeter() {
+		btGattService = btGatt.getService(UUID.fromString(MWDevice.SERVICE_UUID));
+
+		setupCharacteristic(btGattService.getCharacteristic(UUID.fromString(MWDevice.FLOW_RATE_UUID_CHAR)));
+		setupCharacteristic(btGattService.getCharacteristic(UUID.fromString(MWDevice.TOTALIZED_FLOW_RATE_UUID_CHAR)));
+		setupCharacteristic(btGattService.getCharacteristic(UUID.fromString(MWDevice.RESET_FLOAT_RATE_UUID_CHAR)));
+
+	}
+
+	public void read(String uuid) {
+		queue.scheduleOperation(() -> {
+			btGatt.readCharacteristic(btGattService.getCharacteristic(UUID.fromString(uuid)));
+		});
+	}
+
+	private final BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
 
 		@Override
 		public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
 			if(newState == BluetoothProfile.STATE_CONNECTED) {
 				btGatt.discoverServices();
+				queue.setPaused(false);
+			} else {
+				queue.setPaused(true);
 			}
 			super.onConnectionStateChange(gatt, status, newState);
 		}
 
-		private void setupCharacteristic(BluetoothGattCharacteristic characteristic) {
-			btGatt.setCharacteristicNotification(characteristic, true);
-			final BluetoothGattDescriptor descriptor = characteristic.getDescriptor(UUID.fromString(CLIENT_CHARACTERISTIC_CONFIG));
-			descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-			queue.scheduleOperation(new Runnable() {
-				@Override
-				public void run() {
-					btGatt.writeDescriptor(descriptor);
-				}
-			});
-
-		}
 
 		@Override
 		public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-			btGattService = btGatt.getService(UUID.fromString(MWDevice.SERVICE_UUID));
-
-			setupCharacteristic(btGattService.getCharacteristic(UUID.fromString(MWDevice.FLOAT_RATE_UUID_CHAR)));
-			setupCharacteristic(btGattService.getCharacteristic(UUID.fromString(MWDevice.TOTALIZED_FLOAT_RATE_UUID_CHAR)));
-			setupCharacteristic(btGattService.getCharacteristic(UUID.fromString(MWDevice.RESET_FLOAT_RATE_UUID_CHAR)));
-
+			//TODO - make a tool that schedules when two things happen
+			setupMeter();
 			super.onServicesDiscovered(gatt, status);
 		}
 
@@ -121,19 +198,30 @@ public class BTDeviceConnection {
 			onCharacteristicChanged(gatt, characteristic);
 
 			super.onCharacteristicRead(gatt, characteristic, status);
+			queue.markOperationComplete();
 		}
 
 		@Override
 		public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
 			// called for notifications
-			if(operationCallback != null) {
-				if(characteristic.getUuid().equals(UUID.fromString(MWDevice.FLOAT_RATE_UUID_CHAR))) {
-					operationCallback.onFlowRateUpdate(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0));
-				} else if (characteristic.getUuid().equals(UUID.fromString(MWDevice.TOTALIZED_FLOAT_RATE_UUID_CHAR))) {
-					operationCallback.onTotalUpdate(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0));
-				} else if (characteristic.getUuid().equals(UUID.fromString(MWDevice.RESET_FLOAT_RATE_UUID_CHAR))) {
-					operationCallback.onResetTotalUpdate(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0));
-				}
+			switch(characteristic.getUuid().toString()) {
+				case MWDevice.FLOW_RATE_UUID_CHAR:
+					flowCallback.onFlowRateUpdate(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0));
+					break;
+				case MWDevice.TOTALIZED_FLOW_RATE_UUID_CHAR:
+					flowCallback.onTotalUpdate(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0));
+					break;
+				case MWDevice.RESET_FLOAT_RATE_UUID_CHAR:
+					flowCallback.onResetTotalUpdate(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0));
+					break;
+				case MWDevice.PIPE_SIZE_INDEX_UUID_CHAR:
+					settingsCallback.onPipeSizeUpdate(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0));
+					break;
+				case MWDevice.ADJUSTMENT_FACTOR_UUID_CHAR:
+					//TODO BROKEN!!!!
+					settingsCallback.onAdjustmentUpdate(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0));
+					break;
+				//TODO serial? and Id
 			}
 			super.onCharacteristicChanged(gatt, characteristic);
 		}

@@ -37,7 +37,8 @@ public class ScanData implements Comparable<ScanData> {
 	@Override
 	public boolean equals(Object o) {
 		if(o instanceof ScanData) {
-			return name.equals(((ScanData) o).getName());
+
+			return device.getAddress().equals(((ScanData) o).getDevice().getAddress());
 		}
 		return false;
 	}

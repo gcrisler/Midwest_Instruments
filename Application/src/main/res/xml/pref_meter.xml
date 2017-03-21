@@ -7,20 +7,21 @@
         android:selectAllOnFocus="true"
         />
 
-    <ListPreference
+    <com.midwestinstruments.watermeter.preferences.PipeSizePreference
         android:title="Pipe Size"
         android:entries="@array/pref_pipe_size_label"
         android:entryValues="@array/pref_pipe_size"
         android:key="pipe_size_pref"
         />
-    <ListPreference
-        android:title="Flow Rate Units"
-        android:entries="@array/pref_flow_units_label"
-        android:entryValues="@array/pref_flow_units"
-        android:key="flow_rate_pref"
-        />
-    <com.midwestinstruments.watermeter.preferences.NumberPickerPreference
+    <!--<ListPreference-->
+        <!--android:title="Flow Rate Units"-->
+        <!--android:entries="@array/pref_flow_units_label"-->
+        <!--android:entryValues="@array/pref_flow_units"-->
+        <!--android:key="flow_rate_pref"-->
+        <!--/>-->
+    <com.midwestinstruments.watermeter.preferences.AdjustmentPreference
         android:title="Adjustment Factor"
         android:key="adjustment_factor_pref"
         />
+
 </PreferenceScreen>

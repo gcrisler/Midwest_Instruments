@@ -10,6 +10,12 @@ import android.util.AttributeSet;
  */
 public class MeterNamePreference extends EditTextPreference {
 
+	private Invoke<String> saveCallback;
+
+	public void setSaveCallback(Invoke<String> setter) {
+		saveCallback = setter;
+	}
+
 	public MeterNamePreference(Context c) {
 		this(c, null);
 	}
@@ -24,17 +30,16 @@ public class MeterNamePreference extends EditTextPreference {
 		if (which == DialogInterface.BUTTON_POSITIVE) {
 			setText(getEditText().getText().toString());
 			setSummary(getText());
-			// write value
+			if(saveCallback != null) {
+				saveCallback.invoke(getText());
+			}
 		}
 	}
 
 	@Override
 	protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
-		if(restoreValue) {
-			setText("xxx"); // Get from somewhere
-		} else {
-			setText(defaultValue.toString());
-		}
+
+		setText(defaultValue.toString());
 		setSummary(getText());
 	}
 }

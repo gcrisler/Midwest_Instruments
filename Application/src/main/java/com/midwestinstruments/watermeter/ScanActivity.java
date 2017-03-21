@@ -67,8 +67,7 @@ public class ScanActivity extends ListActivity {
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		MeterActivity.device = ((ScanData) activityData.getItem(position)).getDevice();
 
-		Intent intent = new Intent(this, MeterActivity.class);
-		startActivity(intent);
+		startActivity(new Intent(this, MeterActivity.class));
 
 	}
 }

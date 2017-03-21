@@ -50,6 +50,7 @@
                 android:background="@color/labelBackgroundColor"
                 android:paddingLeft="@dimen/margin_label_lr"
                 android:paddingRight="@dimen/margin_label_lr" />
+
         </LinearLayout>
 
         <LinearLayout
@@ -128,8 +129,16 @@
                 android:layout_below="@+id/resetFlowRate"
                 android:layout_alignParentStart="true"
                 android:layout_gravity="right"/>
+
         </LinearLayout>
 
     </LinearLayout>
 
+    <ProgressBar
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:id="@+id/progressBar"/>
 </RelativeLayout>

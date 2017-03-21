@@ -3,6 +3,7 @@ package com.midwestinstruments.watermeter;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
+import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanResult;
@@ -16,7 +17,6 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 /**
  * Created by byronh on 5/9/16.
@@ -119,18 +119,23 @@ public class BTScanner {
 		bluetoothFacade.enable();
 
 		// when our activity comes to the front, start scanning
-		bluetoothFacade.getBluetoothLeScanner().startScan(new ArrayList<ScanFilter>(), scanSettings, scanResult);
+		BluetoothLeScanner scanner = bluetoothFacade.getBluetoothLeScanner();
+		if (scanner != null) {
+			scanner.startScan(new ArrayList<ScanFilter>(), scanSettings, scanResult);
 
-		// schedule the next iteration
-		handler.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				internalStop();
-				if (!stopped) {
-					internalStart();
+			// schedule the next iteration
+			handler.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					internalStop();
+					if (!stopped) {
+						internalStart();
+					}
 				}
-			}
-		}, MWDevice.SCAN_INTERVAL_MS);
+			}, MWDevice.SCAN_INTERVAL_MS);
+		} else {
+
+		}
 	}
 
 	/**

@@ -1,7 +1,12 @@
 package com.midwestinstruments.watermeter;
 
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattService;
 import android.util.Log;
 
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -17,32 +22,43 @@ public class BTOperationQueue {
 	private static final String TAG = BTOperationQueue.class.getSimpleName();
 	private static final int MAX_QUEUE_SIZE = 10;
 
+	private static final int TIMEOUT = 5000;
+
 	private final BlockingQueue<Runnable> queue = new ArrayBlockingQueue<Runnable>(MAX_QUEUE_SIZE, true);
 
 	private final Object waitLock = new Object();
-	private boolean isWaiting = false;
 
-	private boolean running = true;
+	private volatile boolean isWaiting = false;
+	private volatile boolean running = true;
+	private volatile boolean paused = true;
 
-	private final Runnable operation = new Runnable() {
-		@Override
-		public void run() {
-			try {
+	private final Runnable operation = () -> {
+		try {
 
-				while (running) {
-					Runnable operation = pollNextOperation();
-					synchronized (waitLock) {
-						operation.run();
-						isWaiting = true;
-						while(isWaiting) {
-							waitLock.wait();
+			while (running) {
+				Runnable operation = pollNextOperation();
+				synchronized (waitLock) {
+					operation.run();
+					isWaiting = true;
+
+					Timer timer = new Timer();
+					timer.schedule(new TimerTask() {
+						@Override
+						public void run() {
+							Log.w(TAG, "BT Operation took too long");
+							markOperationComplete();
 						}
-					}
+					}, TIMEOUT);
 
+					while(isWaiting) {
+						waitLock.wait();
+					}
+					timer.cancel();
 				}
-			} catch (InterruptedException e) {
-				Log.i(TAG, "Queue interrupted");
+
 			}
+		} catch (InterruptedException e) {
+			Log.i(TAG, "Queue interrupted");
 		}
 	};
 
@@ -59,10 +75,17 @@ public class BTOperationQueue {
 
 	private Runnable pollNextOperation() throws InterruptedException {
 		synchronized (queue) {
-			while (queue.size() == 0) {
+			while (queue.size() == 0 || paused) {
 				queue.wait(); // no operations right now. wait forever.
 			}
 			return queue.poll();
+		}
+	}
+
+	public void setPaused(boolean paused) {
+		synchronized (queue) {
+			this.paused = paused;
+			queue.notifyAll();
 		}
 	}
 

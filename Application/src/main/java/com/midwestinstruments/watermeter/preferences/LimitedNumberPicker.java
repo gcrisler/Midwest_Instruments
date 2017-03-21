@@ -20,6 +20,5 @@ public class LimitedNumberPicker extends NumberPicker {
 		setMinValue(0);
 		setMaxValue(100);
 		super.setWrapSelectorWheel(false);
-		setDisplayedValues(new AdjustmentFormatter().buildValues());
 	}
 }
