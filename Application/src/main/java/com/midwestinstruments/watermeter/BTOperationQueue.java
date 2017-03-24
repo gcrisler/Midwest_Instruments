@@ -20,7 +20,7 @@ import java.util.concurrent.BlockingQueue;
 public class BTOperationQueue {
 
 	private static final String TAG = BTOperationQueue.class.getSimpleName();
-	private static final int MAX_QUEUE_SIZE = 10;
+	private static final int MAX_QUEUE_SIZE = 20;
 
 	private static final int TIMEOUT = 5000;
 
@@ -108,13 +108,18 @@ public class BTOperationQueue {
 	 */
 	public void scheduleOperation(Runnable op) {
 		synchronized (queue) {
-			queue.add(new BTOperation() {
-				@Override
-				void run() {
-					op.run();
-				}
-			});
-			queue.notifyAll();
+			try {
+				queue.add(new BTOperation() {
+					@Override
+					void run() {
+						op.run();
+					}
+				});
+				queue.notifyAll();
+			} catch (IllegalStateException e) {
+				Log.w(TAG, "BT Queue is full.");
+				queue.clear();
+			}
 		}
 	}
 
