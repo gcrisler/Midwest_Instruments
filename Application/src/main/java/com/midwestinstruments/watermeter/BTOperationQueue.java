@@ -24,7 +24,7 @@ public class BTOperationQueue {
 
 	private static final int TIMEOUT = 5000;
 
-	private final BlockingQueue<Runnable> queue = new ArrayBlockingQueue<Runnable>(MAX_QUEUE_SIZE, true);
+	private final BlockingQueue<BTOperation> queue = new ArrayBlockingQueue<>(MAX_QUEUE_SIZE, true);
 
 	private final Object waitLock = new Object();
 
@@ -32,11 +32,21 @@ public class BTOperationQueue {
 	private volatile boolean running = true;
 	private volatile boolean paused = true;
 
+	public static abstract class BTOperation {
+		Throwable source;
+		public BTOperation() {
+			source = new Throwable("BT Operation scheduled");
+		}
+
+		abstract void run();
+	}
+
 	private final Runnable operation = () -> {
+		BTOperation operation = null;
 		try {
 
 			while (running) {
-				Runnable operation = pollNextOperation();
+				operation = pollNextOperation();
 				synchronized (waitLock) {
 					operation.run();
 					isWaiting = true;
@@ -59,6 +69,9 @@ public class BTOperationQueue {
 			}
 		} catch (InterruptedException e) {
 			Log.i(TAG, "Queue interrupted");
+		} catch (Exception e) {
+			Log.e(TAG, "Bluetooth error. Scheduled from: ", operation.source);
+			Log.e(TAG, "Error: ", e);
 		}
 	};
 
@@ -73,7 +86,7 @@ public class BTOperationQueue {
 		thread.start();
 	}
 
-	private Runnable pollNextOperation() throws InterruptedException {
+	private BTOperation pollNextOperation() throws InterruptedException {
 		synchronized (queue) {
 			while (queue.size() == 0 || paused) {
 				queue.wait(); // no operations right now. wait forever.
@@ -95,7 +108,12 @@ public class BTOperationQueue {
 	 */
 	public void scheduleOperation(Runnable op) {
 		synchronized (queue) {
-			queue.add(op);
+			queue.add(new BTOperation() {
+				@Override
+				void run() {
+					op.run();
+				}
+			});
 			queue.notifyAll();
 		}
 	}

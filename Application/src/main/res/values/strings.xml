@@ -24,6 +24,7 @@
     </string-array>
 
     <string-array name="pref_pipe_size">
+        <item>0</item>
         <item>1</item>
         <item>2</item>
         <item>3</item>
@@ -38,25 +39,24 @@
         <item>12</item>
         <item>13</item>
         <item>14</item>
-        <item>15</item>
     </string-array>
 
     <string-array name="pref_pipe_size_label">
-        <item>1/2"</item>
-        <item>3/4"</item>
-        <item>1"</item>
-        <item>1 1/2" sched 40</item>
+        <item>1/2" sched 80</item>
+        <item>3/4" sched 80</item>
+        <item>1" sched 80</item>
         <item>1 1/2" sched 80</item>
-        <item>2" sched 40</item>
+        <item>1 1/2" sched 40</item>
         <item>2" sched 80</item>
-        <item>3" sched 40</item>
+        <item>2" sched 40</item>
         <item>3" sched 80</item>
-        <item>4" sched 40</item>
+        <item>3" sched 40</item>
         <item>4" sched 80</item>
-        <item>6" sched 40</item>
+        <item>4" sched 40</item>
         <item>6" sched 80</item>
-        <item>8" sched 40</item>
+        <item>6" sched 40</item>
         <item>8" sched 80</item>
+        <item>8" sched 40</item>
     </string-array>
 
     <string name="title_activity_meter_settings">Meter Settings</string>

@@ -24,7 +24,7 @@ public class ScanActivity extends ListActivity {
 	private Runnable listUpdate = new Runnable() {
 		@Override
 		public void run() {
-			activityData.update(10000L);
+			activityData.update(15000L);
 			handler.postDelayed(listUpdate, 1000);
 		}
 	};

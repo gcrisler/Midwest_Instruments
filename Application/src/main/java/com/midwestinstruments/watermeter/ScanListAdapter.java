@@ -2,7 +2,6 @@ package com.midwestinstruments.watermeter;
 
 import android.content.Context;
 import android.database.DataSetObserver;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -91,11 +90,19 @@ public class ScanListAdapter implements ListAdapter {
 			v = inflater.inflate(R.layout.scan_list_item, parent, false);
 		}
 
-		((TextView)v.findViewById(R.id.textView3)).setText(list.getList().get(position).getName());
-		((TextView)v.findViewById(R.id.textView2)).setText("db: "+Integer.toString(list.getList().get(position).getRssi()));
-		long time = System.currentTimeMillis() - list.getNodes().get(position).updateTime;
-		((TextView)v.findViewById(R.id.textView3)).setTextColor(Color.argb((int)(255*Math.exp(-time/10000.0)),0,0,0));
-		((TextView)v.findViewById(R.id.textView2)).setTextColor(Color.argb((int)(255*Math.exp(-time/10000.0)),0,0,0));
+		ScanData info = list.getList().get(position);
+
+		((TextView)v.findViewById(R.id.scanItemName)).setText(info.getName());
+		((TextView)v.findViewById(R.id.scanItemRssi)).setText("db: "+Integer.toString(info.getRssi()));
+		//long time = System.currentTimeMillis() - list.getNodes().get(position).updateTime;
+		//((TextView)v.findViewById(R.id.textView3)).setTextColor(Color.argb((int)(255*Math.exp(-time/10000.0)),0,0,0));
+		//((TextView)v.findViewById(R.id.totalizer)).setTextColor(Color.argb((int)(255*Math.exp(-time/10000.0)),0,0,0));
+
+		((TextView)v.findViewById(R.id.scanItemFlow)).setText("Flow: "+Display.formatFlowValue(info.getFlow(), info.getPipeIndex()));
+		((TextView)v.findViewById(R.id.scanItemTotalizer)).setText("Total: " + Display.formatFlowValue(info.getTotalizer(), info
+				.getPipeIndex()));
+		((TextView)v.findViewById(R.id.scanItemResetTotalizer)).setText("Reset Total: " + Display.formatFlowValue(info
+				.getResettableTotalizer(), info.getPipeIndex()));
 
 		return v;
 	}

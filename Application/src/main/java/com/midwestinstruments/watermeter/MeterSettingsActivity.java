@@ -79,7 +79,7 @@ public class MeterSettingsActivity extends PreferenceActivity {
 		MeterActivity.connection.setSettingsCallback(settingsCallback);
 		MeterActivity.connection.read(MWDevice.PIPE_SIZE_INDEX_UUID_CHAR);
 		MeterActivity.connection.read(MWDevice.ADJUSTMENT_FACTOR_UUID_CHAR);
-		idPref.set("TODO");
+		MeterActivity.connection.read(MWDevice.ID_UUID_CHAR);
 
 		ActionBar bar = getActionBar();
 		if(bar != null) {
@@ -118,39 +118,6 @@ public class MeterSettingsActivity extends PreferenceActivity {
 		MeterActivity.connection.setSettingsCallback(null);
 	}
 
-//	private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener =
-//			(Preference preference, Object value) -> {
-//		String stringValue = value != null? value.toString() : "";
-//
-//		if (preference instanceof ListPreference) {
-//			// For list preferences, look up the correct display value in
-//			// the preference's 'entries' list.
-//			ListPreference listPreference = (ListPreference) preference;
-//			int index = listPreference.findIndexOfValue(stringValue);
-//
-//			// Set the summary to reflect the new value.
-//			preference.setSummary(index >= 0 ? listPreference.getEntries()[index] : null);
-//
-//		} else {
-//			// For all other preferences, set the summary to the value's
-//			// simple string representation.
-//			preference.setSummary(stringValue);
-//		}
-//
-//		return true;
-//	};
-
-
-//	private static <T> void bindPreferenceSummaryToValue(Preference preference, T data) {
-//
-//		//TODO - redo all this. pass a lambda that writes the value?
-//
-//		//preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
-//
-//		preference.setDefaultValue(data);
-//		//sBindPreferenceSummaryToValueListener.onPreferenceChange(preference, data);
-//	}
-
 	/**
 	 * This method stops fragment injection in malicious applications.
 	 */
@@ -183,12 +150,6 @@ public class MeterSettingsActivity extends PreferenceActivity {
 				MeterActivity.connection.SETTINGS.setAdjustmentFactor(val);
 			});
 
-
-
-//			bindPreferenceSummaryToValue(findPreference("meter_name_pref"), idPref.value);
-//			bindPreferenceSummaryToValue(findPreference("pipe_size_pref"), pipeSizePref.value);
-//			//bindPreferenceSummaryToValue(findPreference("flow_rate_pref"), adjustmentPref.value);
-//			bindPreferenceSummaryToValue(findPreference("adjustment_factor_pref"), adjustmentPref.value);
 		}
 	}
 

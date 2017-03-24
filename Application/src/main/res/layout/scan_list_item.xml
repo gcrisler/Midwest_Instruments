@@ -6,27 +6,85 @@
                 android:paddingTop="25dp"
                 android:paddingBottom="25dp">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Meter Name"
-        android:id="@+id/textView3"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginLeft="15dp"/>
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Large Text"
-        android:id="@+id/textView2"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="false"
-        android:layout_alignParentBottom="false"
-        android:layout_alignWithParentIfMissing="false"
-        android:layout_centerVertical="true"/>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="Meter Name"
+                android:id="@+id/scanItemName"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="15dp"
+                android:layout_weight=".5"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Large Text"
+                android:id="@+id/scanItemRssi"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:layout_alignWithParentIfMissing="false"
+                android:layout_alignBaseline="@+id/scanItemName"
+                android:layout_alignBottom="@+id/scanItemName"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="14dp"
+                android:layout_weight=".5"
+                android:gravity="right"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
+            android:layout_alignParentStart="true"
+            android:paddingStart="30dp"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Flow:"
+                android:id="@+id/scanItemFlow"
+                android:layout_alignParentTop="true"
+                android:layout_alignStart="@+id/scanItemName"
+                android:layout_weight=".3"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Total:"
+                android:id="@+id/scanItemTotalizer"
+                android:layout_alignBottom="@+id/scanItemFlow"
+                android:layout_alignEnd="@+id/scanItemName"
+                android:layout_weight=".3"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Reset Total:"
+                android:id="@+id/scanItemResetTotalizer"
+                android:layout_marginEnd="16dp"
+                android:layout_alignBaseline="@+id/scanItemTotalizer"
+                android:layout_alignBottom="@+id/scanItemTotalizer"
+                android:layout_toStartOf="@+id/scanItemRssi"
+                android:layout_weight=".3"/>
+        </LinearLayout>
+    </LinearLayout>
 
 </RelativeLayout>

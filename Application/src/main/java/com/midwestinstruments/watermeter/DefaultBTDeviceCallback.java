@@ -38,4 +38,9 @@ public class DefaultBTDeviceCallback implements BTDeviceConnection.BTFlowDeviceC
 	public void onSerialUpdate(int serial) {
 
 	}
+
+	@Override
+	public void onConnect() {
+
+	}
 }

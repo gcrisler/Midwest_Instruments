@@ -30,9 +30,9 @@ public class BTDeviceConnection {
 
 	private Activity parentActivity;
 
-	private BluetoothGatt btGatt;
+	private volatile BluetoothGatt btGatt;
 
-	private BluetoothGattService btGattService;
+	private volatile BluetoothGattService btGattService;
 
 	private volatile BTFlowDeviceCallback flowCallback = new DefaultBTDeviceCallback();
 	private volatile BTSettingsDeviceCallback settingsCallback = new DefaultBTDeviceCallback();
@@ -43,6 +43,7 @@ public class BTDeviceConnection {
 		void onFlowRateUpdate(int flowrate);
 		void onTotalUpdate(int floatRate);
 		void onResetTotalUpdate(int resetRate);
+		void onConnect();
 	}
 
 	public interface  BTSettingsDeviceCallback {
@@ -108,14 +109,16 @@ public class BTDeviceConnection {
 	 */
 	public void resetTotal() {
 		scheduleGattWrite(MWDevice.RESET_FLOAT_RATE_UUID_CHAR, (BluetoothGattCharacteristic gattChar) -> {
-			gattChar.setValue(0, BluetoothGattCharacteristic.FORMAT_UINT8, 0);
+			gattChar.setValue(MWDevice.RESET_VALUE, BluetoothGattCharacteristic.FORMAT_UINT8, 0);
 		});
 	}
 
 	class Settings {
 		public void setMeterId(String id) {
-			if(id.length() <= 4) {
-				Log.w("TODO", "No device support yet");
+			if(id.length() < 10) {
+				scheduleGattWrite(MWDevice.ID_UUID_CHAR, (BluetoothGattCharacteristic gattChar) -> {
+					gattChar.setValue(id.getBytes());
+				});
 			}
 		}
 
@@ -177,7 +180,6 @@ public class BTDeviceConnection {
 		public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
 			if(newState == BluetoothProfile.STATE_CONNECTED) {
 				btGatt.discoverServices();
-				queue.setPaused(false);
 			} else {
 				queue.setPaused(true);
 			}
@@ -187,8 +189,9 @@ public class BTDeviceConnection {
 
 		@Override
 		public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-			//TODO - make a tool that schedules when two things happen
 			setupMeter();
+			queue.setPaused(false);
+			flowCallback.onConnect();
 			super.onServicesDiscovered(gatt, status);
 		}
 
@@ -220,6 +223,9 @@ public class BTDeviceConnection {
 				case MWDevice.ADJUSTMENT_FACTOR_UUID_CHAR:
 					//TODO BROKEN!!!!
 					settingsCallback.onAdjustmentUpdate(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0));
+					break;
+				case MWDevice.ID_UUID_CHAR:
+					settingsCallback.onIdUpdate(characteristic.getStringValue(0));
 					break;
 				//TODO serial? and Id
 			}

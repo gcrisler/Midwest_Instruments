@@ -17,6 +17,7 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by byronh on 5/9/16.
@@ -48,7 +49,7 @@ public class BTScanner {
 	 * Filter for unwanted devices from scan
 	 */
 	private final ScanFilter filter = new ScanFilter.Builder()
-			.setDeviceName(MWDevice.NAME).build();
+			.setManufacturerData(MWDevice.MANUFACTURER_ID, null).build();
 
 	/**
 	 * Settings related to the scan
@@ -121,18 +122,15 @@ public class BTScanner {
 		// when our activity comes to the front, start scanning
 		BluetoothLeScanner scanner = bluetoothFacade.getBluetoothLeScanner();
 		if (scanner != null) {
-			scanner.startScan(new ArrayList<ScanFilter>(), scanSettings, scanResult);
+			scanner.startScan(Arrays.asList(filter), scanSettings, scanResult);
 
 			// schedule the next iteration
-			handler.postDelayed(new Runnable() {
-				@Override
-				public void run() {
+			handler.postDelayed(() -> {
 					internalStop();
 					if (!stopped) {
 						internalStart();
 					}
-				}
-			}, MWDevice.SCAN_INTERVAL_MS);
+				}, MWDevice.SCAN_INTERVAL_MS);
 		} else {
 
 		}

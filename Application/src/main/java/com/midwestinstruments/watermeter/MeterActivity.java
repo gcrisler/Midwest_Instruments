@@ -23,10 +23,12 @@ public class MeterActivity extends Activity {
 
 	boolean hasData = false;
 	Timer timer;
+	private boolean previouslyConnected = false;
 
 	private String id = "";
 	private int serial = 0;
 	private int pipeSize = -1;
+	private int flowrate = -1;
 
 	private class TimeoutTask extends TimerTask {
 		@Override
@@ -38,24 +40,14 @@ public class MeterActivity extends Activity {
 		}
 	}
 
-	private String formatValue(int value) {
-		if(pipeSize >= 0) {
-			if (MWDevice.DECIMALS_FOR_PIPE_SIZE[pipeSize] == 1) {
-				return String.format("%d.%01d", value / 10, value % 10);
-			} else {
-				return String.format("%d", value);
-			}
-		}
-		return "";
-	}
-
 	private BTDeviceConnection.BTFlowDeviceCallback callback = new BTDeviceConnection.BTFlowDeviceCallback() {
 		@Override
 		public void onFlowRateUpdate(final int flowrate) {
 			runOnUiThread(() -> {
+				MeterActivity.this.flowrate = flowrate;
 				setHasData();
 				TextView view = (TextView) findViewById(R.id.floatRate);
-				view.setText(formatValue(flowrate));
+				view.setText(Display.formatFlowValue(flowrate, pipeSize));
 			});
 		}
 
@@ -64,7 +56,7 @@ public class MeterActivity extends Activity {
 			runOnUiThread(() -> {
 				setHasData();
 				TextView view = (TextView)findViewById(R.id.totalizerFlowRate);
-				view.setText(formatValue(floatRate));
+				view.setText(Display.formatFlowValue(floatRate, pipeSize));
 			});
 		}
 
@@ -73,9 +65,15 @@ public class MeterActivity extends Activity {
 			runOnUiThread(() -> {
 				setHasData();
 				TextView view = (TextView) findViewById(R.id.resetFlowRate);
-				view.setText(formatValue(resetRate));
+				view.setText(Display.formatFlowValue(resetRate, pipeSize));
 			});
 
+		}
+
+		@Override
+		public void onConnect() {
+			readSettings();
+			previouslyConnected = true;
 		}
 	};
 
@@ -103,7 +101,7 @@ public class MeterActivity extends Activity {
 	};
 
 	protected void setHasData() {
-		if(pipeSize > -1) {
+		if(!hasData && pipeSize > -1 && flowrate > -1) {
 			hasData = true;
 			timer.cancel();
 			ProgressBar progress = (ProgressBar) findViewById(R.id.progressBar);
@@ -113,6 +111,8 @@ public class MeterActivity extends Activity {
 
 	@Override
 	protected void onPause() {
+		pipeSize = -1;
+		flowrate = -1;
 		super.onPause();
 		timer.cancel();
 	}
@@ -127,7 +127,9 @@ public class MeterActivity extends Activity {
 
 		ProgressBar progress = (ProgressBar)findViewById(R.id.progressBar);
 		progress.setVisibility(View.VISIBLE);
-		readSettings();
+		if(previouslyConnected) {
+			readSettings();
+		}
 	}
 
 	@Override

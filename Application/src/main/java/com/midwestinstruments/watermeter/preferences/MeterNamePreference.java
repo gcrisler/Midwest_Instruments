@@ -37,6 +37,13 @@ public class MeterNamePreference extends EditTextPreference {
 	}
 
 	@Override
+	public void setDefaultValue(Object defaultValue) {
+		setText(defaultValue.toString());
+		setSummary(getText());
+		super.setDefaultValue(defaultValue);
+	}
+
+	@Override
 	protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
 
 		setText(defaultValue.toString());
