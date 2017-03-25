@@ -18,10 +18,14 @@ public class Display {
 	}
 
 	public static String asHex(byte[] bytes) {
-		StringBuilder sb = new StringBuilder();
- 		for(byte b : bytes) {
-			sb.append(String.format("%02x ", b));
+		if(bytes != null ) {
+			StringBuilder sb = new StringBuilder();
+
+			for(byte b : bytes) {
+				sb.append(String.format("%02x ", b));
+			}
+			return sb.toString();
 		}
-		return sb.toString();
+		return "";
 	}
 }

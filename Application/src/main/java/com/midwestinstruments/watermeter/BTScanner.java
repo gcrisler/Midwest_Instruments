@@ -162,13 +162,15 @@ public class BTScanner {
 	private final ScanCallback scanResult = new ScanCallback() {
 		@Override
 		public void onScanResult(int callbackType, ScanResult result) {
-			//called when each scan result comes through
-			Log.d(SCANNER, String.format("scan result %s rssi:%d", result.getDevice().getName(), result.getRssi()));
-			Log.d(SCANNER, Display.asHex(result.getScanRecord().getManufacturerSpecificData(MWDevice.MANUFACTURER_ID)));
-			if(callback != null) {
-				callback.onScan(result);
+			if(result.getScanRecord().getManufacturerSpecificData(MWDevice.MANUFACTURER_ID) != null){
+				//called when each scan result comes through
+				Log.d(SCANNER, String.format("scan result %s rssi:%d", result.getDevice().getName(), result.getRssi()));
+				Log.d(SCANNER, Display.asHex(result.getScanRecord().getManufacturerSpecificData(MWDevice.MANUFACTURER_ID)));
+				if (callback != null) {
+					callback.onScan(result);
+				}
+				super.onScanResult(callbackType, result);
 			}
-			super.onScanResult(callbackType, result);
 		}
 
 		@Override

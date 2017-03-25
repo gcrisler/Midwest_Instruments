@@ -18,16 +18,8 @@
 <resources>
     <string name="app_name">Midwest Instruments</string>
 
+    <string name="company_name">Midwest Instruments &amp; Controls</string>
+    <string name="company_website">www.micmeter.com</string>
+    <string name="company_phone_nr">(715)523-1268</string>
 
-
-    <string name="intro_message">
-        <![CDATA[
-        
-            
-            This sample demonstrates how to use the Bluetooth LE Generic Attribute Profile (GATT)
-            to transmit arbitrary data between devices.
-            
-        
-        ]]>
-    </string>
 </resources>
