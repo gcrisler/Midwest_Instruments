@@ -25,7 +25,7 @@ public class ScanActivity extends ListActivity {
 		@Override
 		public void run() {
 			activityData.update(15000L);
-			handler.postDelayed(listUpdate, 1000);
+			handler.postDelayed(listUpdate, 500);
 		}
 	};
 
@@ -50,6 +50,9 @@ public class ScanActivity extends ListActivity {
 
 	@Override
 	protected void onResume() {
+		// expire everything
+		activityData.update(0);
+
 		scanner.startScan();
 		handler.post(listUpdate);
 		super.onResume();

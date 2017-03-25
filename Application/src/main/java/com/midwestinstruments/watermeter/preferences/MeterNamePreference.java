@@ -42,11 +42,4 @@ public class MeterNamePreference extends EditTextPreference {
 		setSummary(getText());
 		super.setDefaultValue(defaultValue);
 	}
-
-	@Override
-	protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
-
-		setText(defaultValue.toString());
-		setSummary(getText());
-	}
 }

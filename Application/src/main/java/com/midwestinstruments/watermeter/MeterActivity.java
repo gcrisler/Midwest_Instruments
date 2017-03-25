@@ -9,8 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import com.midwestinstruments.watermeter.preferences.Invoke;
+import android.widget.Toast;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -47,7 +46,7 @@ public class MeterActivity extends Activity {
 		public void onFlowRateUpdate(final int flowrate) {
 			runOnUiThread(() -> {
 				MeterActivity.this.flowrate = flowrate;
-				setHasData();
+				updateGui();
 				TextView view = (TextView) findViewById(R.id.floatRate);
 				view.setText(Display.formatFlowValue(flowrate, pipeSize));
 			});
@@ -56,7 +55,7 @@ public class MeterActivity extends Activity {
 		@Override
 		public void onTotalUpdate(final int floatRate) {
 			runOnUiThread(() -> {
-				setHasData();
+				updateGui();
 				TextView view = (TextView)findViewById(R.id.totalizerFlowRate);
 				view.setText(Display.formatFlowValue(floatRate, pipeSize));
 			});
@@ -65,7 +64,7 @@ public class MeterActivity extends Activity {
 		@Override
 		public void onResetTotalUpdate(final int resetRate) {
 			runOnUiThread(() -> {
-				setHasData();
+				updateGui();
 				TextView view = (TextView) findViewById(R.id.resetFlowRate);
 				view.setText(Display.formatFlowValue(resetRate, pipeSize));
 			});
@@ -84,7 +83,7 @@ public class MeterActivity extends Activity {
 		public void onPipeSizeUpdate(int pipeSize) {
 			MeterActivity.this.pipeSize = pipeSize;
 			runOnUiThread(() -> {
-				setHasData();
+				updateGui();
 			});
 		}
 
@@ -94,20 +93,30 @@ public class MeterActivity extends Activity {
 		@Override
 		public void onIdUpdate(String id) {
 			MeterActivity.this.id = id;
+			runOnUiThread(() -> {
+				updateGui();
+			});
 		}
 
 		@Override
 		public void onSerialUpdate(int serial) {
 			MeterActivity.this.serial = serial;
+			runOnUiThread(() -> {
+				updateGui();
+			});
+
 		}
 	};
 
-	protected void setHasData() {
+	protected void updateGui() {
 		if(!hasData && pipeSize > -1 && flowrate > -1) {
 			hasData = true;
 			timer.cancel();
 			ProgressBar progress = (ProgressBar) findViewById(R.id.progressBar);
 			progress.setVisibility(View.INVISIBLE);
+		}
+		if(this.id != null && !this.id.isEmpty() && this.serial > 0) {
+			getActionBar().setTitle("Meter: " + this.id + " - #" + this.serial);
 		}
 	}
 
@@ -121,8 +130,9 @@ public class MeterActivity extends Activity {
 
 	@Override
 	protected void onResume() {
-		super.onResume();
 		hasData = false;
+		pipeSize = -1;
+		flowrate = -1;
 		timer.cancel();
 		timer = new Timer();
 		timer.schedule(new TimeoutTask(), FAIL_AFTER_MS);
@@ -132,6 +142,7 @@ public class MeterActivity extends Activity {
 		if(previouslyConnected) {
 			readSettings();
 		}
+		super.onResume();
 	}
 
 	@Override
@@ -147,6 +158,12 @@ public class MeterActivity extends Activity {
 		connection.setCallback(callback);
 		findViewById(R.id.resetButton).setOnClickListener((View v) -> {
 			connection.resetTotal();
+			Toast.makeText(getApplicationContext(), "Totalizer Reset", Toast.LENGTH_LONG).show();
+
+			// we cheat. just set the value onscreen to zero immediately so the user gets feedback
+			TextView view = (TextView) findViewById(R.id.resetFlowRate);
+			view.setText(Display.formatFlowValue(0, pipeSize));
+
 		});
 		connection.connect(device);
 	}
@@ -155,7 +172,7 @@ public class MeterActivity extends Activity {
 		connection.setSettingsCallback(settingsCallback);
 		connection.read(MWDevice.PIPE_SIZE_INDEX_UUID_CHAR);
 		connection.read(MWDevice.SERIAL_NR_UUID_CHAR);
-		//connection.read(MWDevice.ID_UUID_CHAR);
+		connection.read(MWDevice.ID_UUID_CHAR);
 	}
 
 	@Override
@@ -169,10 +186,6 @@ public class MeterActivity extends Activity {
 		switch (item.getItemId()) {
 			case android.R.id.home:
 				// app icon in action bar clicked; go home
-
-				ProgressBar progress = (ProgressBar)findViewById(R.id.progressBar);
-				progress.setVisibility(View.VISIBLE);
-
 				goBack();
 				return true;
 			case R.id.menu_config_action:
@@ -194,6 +207,9 @@ public class MeterActivity extends Activity {
 	}
 
 	private void goBack() {
+		ProgressBar progress = (ProgressBar)findViewById(R.id.progressBar);
+		progress.setVisibility(View.VISIBLE);
+
 		// wait for BT queue to finish. If we don't, we might miss updates
 		connection.whenFinished(() -> {
 			runOnUiThread(() -> {

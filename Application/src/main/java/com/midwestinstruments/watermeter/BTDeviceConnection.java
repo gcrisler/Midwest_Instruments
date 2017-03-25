@@ -248,7 +248,10 @@ public class BTDeviceConnection {
 					Log.d(TAG, "Receive ID");
 					settingsCallback.onIdUpdate(characteristic.getStringValue(0));
 					break;
-				//TODO serial? and Id
+				case MWDevice.SERIAL_NR_UUID_CHAR:
+					Log.d(TAG, "Receive Serial#");
+					settingsCallback.onSerialUpdate(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0));
+					break;
 			}
 			super.onCharacteristicChanged(gatt, characteristic);
 		}

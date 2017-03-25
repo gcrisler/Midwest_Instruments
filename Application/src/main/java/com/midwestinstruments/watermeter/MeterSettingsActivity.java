@@ -2,12 +2,20 @@ package com.midwestinstruments.watermeter;
 
 
 import android.app.ActionBar;
-import android.content.Intent;
+import android.app.Fragment;
+import android.content.Context;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 
 import com.midwestinstruments.watermeter.preferences.AdjustmentPreference;
 import com.midwestinstruments.watermeter.preferences.MeterNamePreference;
@@ -79,7 +87,7 @@ public class MeterSettingsActivity extends PreferenceActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		PreferenceManager.getDefaultSharedPreferences(getBaseContext()).edit().clear().commit();
+		//PreferenceManager.getDefaultSharedPreferences(getBaseContext()).edit().clear().commit();
 
 		pipeSizePref.unload();
 		adjustmentPref.unload();
@@ -95,6 +103,7 @@ public class MeterSettingsActivity extends PreferenceActivity {
 			bar.setDisplayHomeAsUpEnabled(true);
 		}
 
+		getFragmentManager().beginTransaction().replace(android.R.id.content, new PleaseWaitFragment()).commit();
 	}
 
 	@Override
@@ -143,6 +152,26 @@ public class MeterSettingsActivity extends PreferenceActivity {
 	 */
 	protected boolean isValidFragment(String fragmentName) {
 		return PreferenceFragment.class.getName().equals(fragmentName) || SettingsFragment.class.getName().equals(fragmentName);
+	}
+
+	public static class PleaseWaitFragment extends PreferenceFragment {
+
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+			ViewGroup view = (ViewGroup)super.onCreateView(inflater, container, savedInstanceState);
+			return drawProgressBar(view);
+//			view.addView(inflater.inflate(R.layout.preference_progress, view));
+		}
+
+		private View drawProgressBar(ViewGroup view) {
+			FrameLayout progress = new FrameLayout(view.getContext());
+			FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
+			lp.gravity = Gravity.CENTER;
+			progress.addView(new ProgressBar(view.getContext()), lp);
+			FrameLayout.LayoutParams lp2 = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+			view.addView(progress, lp2);
+			return view;
+		}
 	}
 
 	public static class SettingsFragment extends PreferenceFragment {
