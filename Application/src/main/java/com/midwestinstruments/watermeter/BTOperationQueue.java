@@ -22,7 +22,7 @@ public class BTOperationQueue {
 	private static final String TAG = BTOperationQueue.class.getSimpleName();
 	private static final int MAX_QUEUE_SIZE = 20;
 
-	private static final int TIMEOUT = 5000;
+	private static final int TIMEOUT = 8000;
 
 	private final BlockingQueue<BTOperation> queue = new ArrayBlockingQueue<>(MAX_QUEUE_SIZE, true);
 
@@ -32,10 +32,12 @@ public class BTOperationQueue {
 	private volatile boolean running = true;
 	private volatile boolean paused = true;
 
-	public static abstract class BTOperation {
+	private static abstract class BTOperation {
 		Throwable source;
-		public BTOperation() {
+		boolean needsResponse;
+		public BTOperation(boolean needsResponse) {
 			source = new Throwable("BT Operation scheduled");
+			this.needsResponse = needsResponse;
 		}
 
 		abstract void run();
@@ -49,21 +51,25 @@ public class BTOperationQueue {
 				operation = pollNextOperation();
 				synchronized (waitLock) {
 					operation.run();
-					isWaiting = true;
 
-					Timer timer = new Timer();
-					timer.schedule(new TimerTask() {
-						@Override
-						public void run() {
-							Log.w(TAG, "BT Operation took too long");
-							markOperationComplete();
+					if(operation.needsResponse) {
+						isWaiting = true;
+
+						Timer timer = new Timer();
+						final BTOperation currentOperation = operation;
+						timer.schedule(new TimerTask() {
+							@Override
+							public void run() {
+								Log.w(TAG, "BT Operation took too long:", currentOperation.source);
+								markOperationComplete();
+							}
+						}, TIMEOUT);
+
+						while (isWaiting) {
+							waitLock.wait();
 						}
-					}, TIMEOUT);
-
-					while(isWaiting) {
-						waitLock.wait();
+						timer.cancel();
 					}
-					timer.cancel();
 				}
 
 			}
@@ -97,6 +103,7 @@ public class BTOperationQueue {
 
 	public void setPaused(boolean paused) {
 		synchronized (queue) {
+			Log.d(TAG, "pause queue: "+paused);
 			this.paused = paused;
 			queue.notifyAll();
 		}
@@ -106,10 +113,10 @@ public class BTOperationQueue {
 	 * Schedule an operation. Run it later.
 	 * @param op the operation to run
 	 */
-	public void scheduleOperation(Runnable op) {
+	public void scheduleOperation(Runnable op, boolean needsResponse) {
 		synchronized (queue) {
 			try {
-				queue.add(new BTOperation() {
+				queue.add(new BTOperation(needsResponse) {
 					@Override
 					void run() {
 						op.run();
@@ -137,6 +144,7 @@ public class BTOperationQueue {
 	 * Stop the queue.
 	 */
 	public void stopQueue() {
+		Log.d(TAG, "queue stopped");
 		running = false;
 		reset();
 	}

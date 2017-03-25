@@ -21,6 +21,8 @@ import java.util.UUID;
  */
 public class BTDeviceConnection {
 
+	public static final String TAG = BTDeviceConnection.class.getSimpleName();
+
 	public static String CLIENT_CHARACTERISTIC_CONFIG = "00002902-0000-1000-8000-00805f9b34fb";
 
 	/**
@@ -78,28 +80,36 @@ public class BTDeviceConnection {
 	}
 
 	public void connect(BluetoothDevice device) {
+		Log.d(TAG, "BT Connect");
 		btGatt = device.connectGatt(parentActivity.getApplicationContext(), false, gattCallback);
 		btGatt.connect();
 		queue = new BTOperationQueue();
 	}
 
 	public void disconnect() {
+		Log.d(TAG, "BT Disconnect");
 		btGatt.disconnect();
 		queue.stopQueue();
 	}
 
-
-
-	public interface BTCharacteristicOperation {
-		public void execute(BluetoothGattCharacteristic gattChar);
+	public void whenFinished(Runnable r) {
+		Log.d(TAG, "schedule external operation");
+		queue.scheduleOperation(() -> {
+			Log.d(TAG, "execute external operation");
+			r.run();
+		}, false);
 	}
 
-	public void scheduleGattWrite(String gattUUID, BTCharacteristicOperation op) {
+	private interface BTCharacteristicOperation {
+		void execute(BluetoothGattCharacteristic gattChar);
+	}
+
+	private void scheduleGattWrite(String gattUUID, BTCharacteristicOperation op) {
 		queue.scheduleOperation(()->{
 				BluetoothGattCharacteristic gattChar = btGattService.getCharacteristic(UUID.fromString(gattUUID));
 				op.execute(gattChar);
 				btGatt.writeCharacteristic(gattChar);
-			}
+			}, true
 		);
 	}
 
@@ -147,7 +157,7 @@ public class BTDeviceConnection {
 		descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
 		queue.scheduleOperation(() -> {
 			btGatt.writeDescriptor(descriptor);
-		});
+		}, true);
 
 	}
 //
@@ -160,6 +170,7 @@ public class BTDeviceConnection {
 //	}
 
 	public void setupMeter() {
+		Log.d(TAG, "meter setup");
 		btGattService = btGatt.getService(UUID.fromString(MWDevice.SERVICE_UUID));
 
 		setupCharacteristic(btGattService.getCharacteristic(UUID.fromString(MWDevice.FLOW_RATE_UUID_CHAR)));
@@ -169,9 +180,11 @@ public class BTDeviceConnection {
 	}
 
 	public void read(String uuid) {
+		Log.d(TAG, "schedule "+uuid);
 		queue.scheduleOperation(() -> {
+			Log.d(TAG, "execute "+uuid);
 			btGatt.readCharacteristic(btGattService.getCharacteristic(UUID.fromString(uuid)));
-		});
+		}, true);
 	}
 
 	private final BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
@@ -180,8 +193,10 @@ public class BTDeviceConnection {
 		public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
 			if(newState == BluetoothProfile.STATE_CONNECTED) {
 				btGatt.discoverServices();
+				Log.d(TAG, "BT Connected");
 			} else {
 				queue.setPaused(true);
+				Log.d(TAG, "BT Disconnected");
 			}
 			super.onConnectionStateChange(gatt, status, newState);
 		}
@@ -191,6 +206,7 @@ public class BTDeviceConnection {
 		public void onServicesDiscovered(BluetoothGatt gatt, int status) {
 			setupMeter();
 			queue.setPaused(false);
+			Log.d(TAG, "BT Services Discovered");
 			flowCallback.onConnect();
 			super.onServicesDiscovered(gatt, status);
 		}
@@ -209,22 +225,27 @@ public class BTDeviceConnection {
 			// called for notifications
 			switch(characteristic.getUuid().toString()) {
 				case MWDevice.FLOW_RATE_UUID_CHAR:
+					Log.d(TAG, "Receive flow rate");
 					flowCallback.onFlowRateUpdate(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0));
 					break;
 				case MWDevice.TOTALIZED_FLOW_RATE_UUID_CHAR:
+					Log.d(TAG, "Receive Total");
 					flowCallback.onTotalUpdate(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0));
 					break;
 				case MWDevice.RESET_FLOAT_RATE_UUID_CHAR:
+					Log.d(TAG, "Receive reset total");
 					flowCallback.onResetTotalUpdate(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0));
 					break;
 				case MWDevice.PIPE_SIZE_INDEX_UUID_CHAR:
+					Log.d(TAG, "Receive pipe size");
 					settingsCallback.onPipeSizeUpdate(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0));
 					break;
 				case MWDevice.ADJUSTMENT_FACTOR_UUID_CHAR:
-					//TODO BROKEN!!!!
+					Log.d(TAG, "Receive adjustment");
 					settingsCallback.onAdjustmentUpdate(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0));
 					break;
 				case MWDevice.ID_UUID_CHAR:
+					Log.d(TAG, "Receive ID");
 					settingsCallback.onIdUpdate(characteristic.getStringValue(0));
 					break;
 				//TODO serial? and Id
@@ -235,18 +256,21 @@ public class BTDeviceConnection {
 		@Override
 		public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
 			queue.markOperationComplete();
+			Log.d(TAG, "Descriptor written");
 			super.onDescriptorWrite(gatt, descriptor, status);
 		}
 
 		@Override
 		public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
 			queue.markOperationComplete();
+			Log.d(TAG, "Characteristic written");
 			super.onCharacteristicWrite(gatt, characteristic, status);
 		}
 
 		@Override
 		public void onReliableWriteCompleted(BluetoothGatt gatt, int status) {
 			queue.markOperationComplete();
+			Log.d(TAG, "ReliableWrite written");
 			super.onReliableWriteCompleted(gatt, status);
 		}
 	};

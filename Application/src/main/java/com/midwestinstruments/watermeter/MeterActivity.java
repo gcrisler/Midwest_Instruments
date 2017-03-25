@@ -10,6 +10,8 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.midwestinstruments.watermeter.preferences.Invoke;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -167,19 +169,40 @@ public class MeterActivity extends Activity {
 		switch (item.getItemId()) {
 			case android.R.id.home:
 				// app icon in action bar clicked; go home
-				Intent intent = new Intent(this, ScanActivity.class);
-				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				startActivity(intent);
+
+				ProgressBar progress = (ProgressBar)findViewById(R.id.progressBar);
+				progress.setVisibility(View.VISIBLE);
+
+				goBack();
 				return true;
 			case R.id.menu_config_action:
-				Intent meterActivityIntent = new Intent(this, MeterSettingsActivity.class);
-				startActivity(meterActivityIntent);
+				connection.whenFinished(() -> {
+					runOnUiThread(() -> {
+						Intent meterActivityIntent = new Intent(this, MeterSettingsActivity.class);
+						startActivity(meterActivityIntent);
+					});
+				});
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}
 	}
 
+	@Override
+	public void onBackPressed() {
+		goBack();
+	}
+
+	private void goBack() {
+		// wait for BT queue to finish. If we don't, we might miss updates
+		connection.whenFinished(() -> {
+			runOnUiThread(() -> {
+				Intent intent = new Intent(this, ScanActivity.class);
+				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(intent);
+			});
+		});
+	}
 	@Override
 	protected void onDestroy() {
 		// This won't get run if we get killed, but if we do, the OS will recoup the resources anyway

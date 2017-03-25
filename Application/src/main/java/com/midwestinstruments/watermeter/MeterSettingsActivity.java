@@ -2,6 +2,7 @@ package com.midwestinstruments.watermeter;
 
 
 import android.app.ActionBar;
+import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
@@ -63,6 +64,10 @@ public class MeterSettingsActivity extends PreferenceActivity {
 			this.value = value;
 			loaded = true;
 		}
+
+		public void unload() {
+			loaded = false;
+		}
 	}
 
 	private boolean settingsLoaded = false;
@@ -75,6 +80,10 @@ public class MeterSettingsActivity extends PreferenceActivity {
 		super.onCreate(savedInstanceState);
 
 		PreferenceManager.getDefaultSharedPreferences(getBaseContext()).edit().clear().commit();
+
+		pipeSizePref.unload();
+		adjustmentPref.unload();
+		idPref.unload();
 
 		MeterActivity.connection.setSettingsCallback(settingsCallback);
 		MeterActivity.connection.read(MWDevice.PIPE_SIZE_INDEX_UUID_CHAR);
@@ -92,12 +101,23 @@ public class MeterSettingsActivity extends PreferenceActivity {
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 		int id = item.getItemId();
 		if (id == android.R.id.home) {
-			if (!super.onMenuItemSelected(featureId, item)) {
-				finish();
-			}
+			goBack();
 			return true;
 		}
 		return super.onMenuItemSelected(featureId, item);
+	}
+
+	@Override
+	public void onBackPressed() {
+		goBack();
+	}
+
+	private void goBack() {
+		MeterActivity.connection.whenFinished(() -> {
+			runOnUiThread(() -> {
+				finish();
+			});
+		});
 	}
 
 	@Override
