@@ -81,15 +81,20 @@ public class BTDeviceConnection {
 
 	public void connect(BluetoothDevice device) {
 		Log.d(TAG, "BT Connect");
+		queue = new BTOperationQueue();
 		btGatt = device.connectGatt(parentActivity.getApplicationContext(), false, gattCallback);
 		btGatt.connect();
-		queue = new BTOperationQueue();
 	}
 
 	public void disconnect() {
 		Log.d(TAG, "BT Disconnect");
 		btGatt.disconnect();
+		btGatt.close();
 		queue.stopQueue();
+	}
+
+	public void resetOperations() {
+		queue.reset();
 	}
 
 	public void whenFinished(Runnable r) {

@@ -109,9 +109,9 @@ public class MeterActivity extends Activity {
 	};
 
 	protected void updateGui() {
+		resetTimer();
 		if(!hasData && pipeSize > -1 && flowrate > -1) {
 			hasData = true;
-			timer.cancel();
 			ProgressBar progress = (ProgressBar) findViewById(R.id.progressBar);
 			progress.setVisibility(View.INVISIBLE);
 		}
@@ -126,6 +126,7 @@ public class MeterActivity extends Activity {
 		flowrate = -1;
 		super.onPause();
 		timer.cancel();
+		connection.resetOperations();
 	}
 
 	@Override
@@ -135,9 +136,7 @@ public class MeterActivity extends Activity {
 		pipeSize = -1;
 		flowrate = -1;
 		id = "";
-		timer.cancel();
-		timer = new Timer();
-		timer.schedule(new TimeoutTask(), FAIL_AFTER_MS);
+		resetTimer();
 
 		ProgressBar progress = (ProgressBar)findViewById(R.id.progressBar);
 		progress.setVisibility(View.VISIBLE);
@@ -145,6 +144,14 @@ public class MeterActivity extends Activity {
 			readSettings();
 		}
 		super.onResume();
+	}
+
+	private void resetTimer() {
+		if(null != timer) {
+			timer.cancel();
+		}
+		timer = new Timer();
+		timer.schedule(new TimeoutTask(), FAIL_AFTER_MS);
 	}
 
 	@Override
