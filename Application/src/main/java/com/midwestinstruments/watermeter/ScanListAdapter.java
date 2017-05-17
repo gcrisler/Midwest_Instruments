@@ -19,11 +19,15 @@ public class ScanListAdapter implements ListAdapter {
 
 	private final ExpireList<ScanData> list = new ExpireList<>();
 	private final Set<DataSetObserver> observers = new HashSet<>();
-
+	private int maxRssi;
 	private Context mContext;
 
 	public ScanListAdapter(Context c) {
 		mContext = c;
+	}
+
+	public void setMaxRssi(int rssi) {
+		maxRssi = rssi;
 	}
 
 	public void add(ScanData item) {
@@ -37,7 +41,7 @@ public class ScanListAdapter implements ListAdapter {
 	}
 
 	private void notifyObservers() {
-		for(DataSetObserver observer:observers) {
+		for (DataSetObserver observer : observers) {
 			observer.onChanged();
 		}
 	}
@@ -85,24 +89,56 @@ public class ScanListAdapter implements ListAdapter {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		View v = convertView;
-		if(v == null) {
-			LayoutInflater inflater = (LayoutInflater)parent.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		if (v == null) {
+			LayoutInflater inflater = (LayoutInflater) parent.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			v = inflater.inflate(R.layout.scan_list_item, parent, false);
 		}
 
 		ScanData info = list.getList().get(position);
 
-		((TextView)v.findViewById(R.id.scanItemName)).setText(info.getName());
-		((TextView)v.findViewById(R.id.scanItemRssi)).setText("db: "+Integer.toString(info.getRssi()));
+		((TextView) v.findViewById(R.id.scanItemName)).setText(info.getName());
+
+		int strength = ((info.getRssi()+127) * 5) / (maxRssi+128);
+		int ref = 0;
+		switch(strength) {
+
+			case 1:
+				ref=R.drawable.signal_1;
+				break;
+			case 2:
+				ref=R.drawable.signal_2;
+				break;
+			case 3:
+				ref=R.drawable.signal_3;
+				break;
+			case 4:
+				ref=R.drawable.signal_4;
+				break;
+			default:
+				ref=R.drawable.signal_0;
+
+		}
+
+		v.findViewById(R.id.scanItemRssiIcon).setBackground(parent.getResources().getDrawable(ref, null));
+
+		//((TextView) v.findViewById(R.id.scanItemRssi)).setText("db: " + Integer.toString(info.getRssi()));
+
 		//long time = System.currentTimeMillis() - list.getNodes().get(position).updateTime;
 		//((TextView)v.findViewById(R.id.textView3)).setTextColor(Color.argb((int)(255*Math.exp(-time/10000.0)),0,0,0));
 		//((TextView)v.findViewById(R.id.totalizer)).setTextColor(Color.argb((int)(255*Math.exp(-time/10000.0)),0,0,0));
 
-		((TextView)v.findViewById(R.id.scanItemFlow)).setText("Flow: "+Display.formatFlowValue(info.getFlow(), info.getPipeIndex()));
-		((TextView)v.findViewById(R.id.scanItemTotalizer)).setText("Total: " + Display.formatFlowValue(info.getTotalizer(), info
-				.getPipeIndex()));
-		((TextView)v.findViewById(R.id.scanItemResetTotalizer)).setText("Reset Total: " + Display.formatFlowValue(info
-				.getResettableTotalizer(), info.getPipeIndex()));
+				((TextView) v.findViewById(R.id.scanItemFlow)).setText(Display.formatFlowValue(info.getFlow(), info.getPipeIndex()) +
+				"   " + "GPM");
+		((TextView) v.findViewById(R.id.scanItemTotalizer)).setText(
+				Display.formatFlowValue(info.getTotalizer(), info.getPipeIndex())+"  " + "Gallons");
+		((TextView) v.findViewById(R.id.scanItemResetTotalizer)).setText(
+				Display.formatFlowValue(info.getResettableTotalizer(), info.getPipeIndex()) + "  " + "Gallons");
+
+
+//		((TextView)v.findViewById(R.id.scanItemFlow)).setText("Flow: 0000.0GPM");
+//		((TextView)v.findViewById(R.id.scanItemTotalizer)).setText("Total: 00000000.0G");
+//		((TextView)v.findViewById(R.id.scanItemResetTotalizer)).setText("Reset Total: 00000000.0G");
+
 
 		return v;
 	}

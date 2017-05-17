@@ -116,7 +116,7 @@ public class MeterActivity extends Activity {
 			progress.setVisibility(View.INVISIBLE);
 		}
 		if(this.id != null && !this.id.isEmpty() && this.serial > 0) {
-			getActionBar().setTitle("Meter: " + this.id + " - #" + this.serial);
+			getActionBar().setTitle("Meter: " + this.id + "  #" + this.serial);
 		}
 	}
 
@@ -131,8 +131,10 @@ public class MeterActivity extends Activity {
 	@Override
 	protected void onResume() {
 		hasData = false;
+		getActionBar().setTitle("Loading");
 		pipeSize = -1;
 		flowrate = -1;
+		id = "";
 		timer.cancel();
 		timer = new Timer();
 		timer.schedule(new TimeoutTask(), FAIL_AFTER_MS);

@@ -3,6 +3,8 @@ package com.midwestinstruments.watermeter.preferences;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.preference.EditTextPreference;
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.util.AttributeSet;
 
 /**
@@ -22,6 +24,17 @@ public class MeterNamePreference extends EditTextPreference {
 
 	public MeterNamePreference(Context c, AttributeSet attr) {
 		super(c, attr);
+
+		InputFilter[] FilterArray = new InputFilter[1];
+		FilterArray[0] = new InputFilter.LengthFilter(10);
+//		FilterArray[1] = (CharSequence source, int start, int end, Spanned dest, int dstart, int dend) -> {
+//				return null;
+//			};
+
+
+
+		getEditText().setFilters(FilterArray);
+
 	}
 
 	@Override

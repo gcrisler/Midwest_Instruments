@@ -27,6 +27,7 @@ public class ScanData implements Comparable<ScanData> {
 		device = result.getDevice();
 		name = device.getName();
 		rssi = result.getRssi();
+
 		byte[] data = result.getScanRecord().getManufacturerSpecificData(MWDevice.MANUFACTURER_ID);
 		if(data != null) {
 			ByteBuffer buff = ByteBuffer.wrap(data);

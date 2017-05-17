@@ -125,7 +125,7 @@ public class BTDeviceConnection {
 
 	class Settings {
 		public void setMeterId(String id) {
-			if(id.length() < 10) {
+			if(id.length() <= 10 && id.length() > 0) {
 				scheduleGattWrite(MWDevice.ID_UUID_CHAR, (BluetoothGattCharacteristic gattChar) -> {
 					gattChar.setValue(id.getBytes());
 				});

@@ -1,90 +1,133 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="horizontal"
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-                android:paddingTop="25dp"
-                android:paddingBottom="25dp">
+              android:orientation="horizontal"
+              android:paddingBottom="20dp"
+              android:paddingLeft="10dp"
+              android:paddingTop="25dp"
+              android:paddingRight="0dp">
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <TableLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_weight="1"
+        >
 
-        <LinearLayout
-            android:orientation="horizontal"
+        <TableRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="Meter Name"
                 android:id="@+id/scanItemName"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginLeft="15dp"
-                android:layout_weight=".5"/>
-
-            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="Large Text"
-                android:id="@+id/scanItemRssi"
-                android:layout_marginLeft="15dp"
-                android:layout_marginRight="15dp"
-                android:layout_alignWithParentIfMissing="false"
-                android:layout_alignBaseline="@+id/scanItemName"
-                android:layout_alignBottom="@+id/scanItemName"
-                android:layout_alignParentEnd="true"
-                android:layout_marginEnd="14dp"
-                android:layout_weight=".5"
-                android:gravity="right"/>
+                android:text="METER1"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:layout_span="2"/>
 
-        </LinearLayout>
+        </TableRow>
 
-        <LinearLayout
-            android:orientation="horizontal"
+        <TableRow
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_centerVertical="true"
-            android:layout_alignParentStart="true"
-            android:paddingStart="30dp"
-            >
+            android:layout_height="match_parent">
 
             <TextView
+                android:id="@+id/textView13"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
                 android:text="Flow:"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:layout_gravity="right"
+                android:layout_marginRight="10dp"/>
+
+            <TextView
                 android:id="@+id/scanItemFlow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_alignStart="@+id/scanItemName"
-                android:layout_weight=".3"/>
+                android:text="00000.0   GPM"
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
             <TextView
+                android:id="@+id/textView14"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
                 android:text="Total:"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:layout_gravity="right"
+                android:layout_marginRight="10dp"/>
+
+            <TextView
                 android:id="@+id/scanItemTotalizer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_alignBottom="@+id/scanItemFlow"
                 android:layout_alignEnd="@+id/scanItemName"
-                android:layout_weight=".3"/>
+                android:text="00000000.0 Gallons"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
             <TextView
+                android:id="@+id/textView15"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
                 android:text="Reset Total:"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:layout_marginRight="10dp"
+                android:layout_gravity="right"/>
+
+            <TextView
                 android:id="@+id/scanItemResetTotalizer"
-                android:layout_marginEnd="16dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_alignBaseline="@+id/scanItemTotalizer"
                 android:layout_alignBottom="@+id/scanItemTotalizer"
+                android:layout_marginEnd="16dp"
                 android:layout_toStartOf="@+id/scanItemRssi"
-                android:layout_weight=".3"/>
-        </LinearLayout>
-    </LinearLayout>
+                android:text="00000000.0 Gallons"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                />
+        </TableRow>
 
-</RelativeLayout>
+    </TableLayout>
+
+    <View
+        android:id="@+id/scanItemRssiIcon"
+        android:layout_width="40dp"
+        android:layout_height="30dp"
+            android:background="@drawable/signal_0"
+        android:layout_marginRight="10dp"
+        android:layout_gravity="center_vertical"/>
+    <!--<TextView-->
+        <!--android:id="@+id/scanItemRssi"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignWithParentIfMissing="false"-->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:text="XXX"-->
+        <!--android:textAppearance="?android:attr/textAppearanceLarge"-->
+        <!--android:layout_gravity="center_vertical"-->
+        <!--android:layout_weight="0"/>-->
+
+    <View
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/right_arrow"
+        android:layout_gravity="center_vertical"
+        android:layout_marginRight="-20dp"
+        android:layout_marginLeft="5dp"/>
+</LinearLayout>

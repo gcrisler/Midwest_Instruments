@@ -3,6 +3,7 @@ package com.midwestinstruments.watermeter;
 import android.app.ListActivity;
 import android.bluetooth.le.ScanResult;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -21,6 +22,8 @@ public class ScanActivity extends ListActivity {
 
 	private Handler handler;
 
+	private int maxRssi;
+
 	private Runnable listUpdate = new Runnable() {
 		@Override
 		public void run() {
@@ -32,12 +35,23 @@ public class ScanActivity extends ListActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		handler = new Handler();
+		SharedPreferences prefs = getPreferences(0);
+		maxRssi = prefs.getInt("MAX_RSSI", -64);
 		activityData = new ScanListAdapter(this);
+		activityData.setMaxRssi(maxRssi);
 		scanner = new BTScanner(this);
 		scanner.setCallback(new BTScanner.ScannerCallback() {
 			@Override
 			public void onScan(ScanResult result) {
 				ScanData data = new ScanData();
+				if(result.getRssi() > maxRssi) {
+					maxRssi = result.getRssi();
+					SharedPreferences.Editor edit = prefs.edit();
+					edit.putInt("MAX_RSSI", maxRssi);
+					edit.commit();
+					activityData.setMaxRssi(maxRssi);
+
+				}
 				data.set(result);
 				activityData.add(data);
 			}
