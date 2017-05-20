@@ -1,6 +1,7 @@
 
 apply plugin: 'com.android.application'
 apply plugin: 'me.tatarka.retrolambda'
+apply from: 'https://github.com/aayvazyan-tgm/autodetect_android_sdk_and_buildTools/releases/download/1.2/sdktools.gradle'
 
 dependencies {
     testCompile 'junit:junit:4.12'
@@ -16,7 +17,7 @@ dependencies {
 
 android {
     compileSdkVersion 23
-    buildToolsVersion '25.0.0'
+    buildToolsVersion getHighestAvailableTools('25.0.0')
 
     defaultConfig {
         minSdkVersion 21 // we'll target this for now.
