@@ -54,7 +54,8 @@
         <activity
             android:name=".ScanActivity"
             android:label="@string/app_name"
-            android:launchMode="singleTop">
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -64,12 +65,14 @@
 
         <activity android:name=".MeterActivity"
                   android:launchMode="singleTop"
+                  android:screenOrientation="portrait"
             />
 
         <activity
             android:name=".MeterSettingsActivity"
             android:label="@string/title_activity_meter_settings"
-            android:parentActivityName=".MeterActivity" >
+            android:parentActivityName=".MeterActivity"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.midwestinstruments.watermeter.MeterSettingsActivity" />
