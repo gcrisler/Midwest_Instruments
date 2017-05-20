@@ -78,6 +78,6 @@ public class ScanData implements Comparable<ScanData> {
 
 	@Override
 	public int compareTo(ScanData another) {
-		return Integer.compare(rssi, another.getRssi());
+		return Integer.compare(another.getRssi(), rssi);
 	}
 }
